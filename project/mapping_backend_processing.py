@@ -335,6 +335,12 @@ def extract_json_from_the_model_response(jsn_data):
         logger.info("Unexpected error occurred while extracting JSON data:", e)
         return {}
     
+def clean_year_columns(df, year_columns):
+    for col in year_columns:
+        if col in df.columns:
+            # Replace any non-numeric values with NaN
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+    return df
 
 def normalize_and_convert_to_dataframe(cleaned_data):
     """
@@ -365,7 +371,10 @@ def normalize_and_convert_to_dataframe(cleaned_data):
 
         # Convert the dictionary to a DataFrame
         df = pd.DataFrame(cleaned_data)
-        return df
+        cols = df.columns[1:]
+        cleaned_df = clean_year_columns(df, cols)
+
+        return cleaned_df
     
     except ValueError as ve:
         logger.info(f"Value error: {ve}")
